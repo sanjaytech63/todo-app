@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 export default function Hero() {
   const router = useRouter();
   return (
-    <section className="py-12 md:py-24 bg-white">
+    <section className="py-12 pt-20 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center md:flex-row">
         <div className="md:w-1/2 mb-12 md:mb-0">
           <h1 className="text-4xl text-gray-900 md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">

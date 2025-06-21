@@ -92,7 +92,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen py-12 pt-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center bg-gray-50">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden w-full">
         <div className="md:flex">
           <div className="md:w-1/2 p-8 sm:p-12">
@@ -120,6 +120,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   error={errors.name}
                   required
+                  placeholder='Full name'
                 />
 
                 <InputField
@@ -130,6 +131,7 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   error={errors.email}
+                  placeholder='Email'
                   required
                 />
 
@@ -141,6 +143,7 @@ export default function ContactPage() {
                   value={formData.message}
                   onChange={handleChange}
                   error={errors.message}
+                  placeholder='Your message '
                   required
                 />
 

@@ -67,6 +67,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           type="text"
           value={formData.name}
           onChange={handleChange}
+          placeholder='Full name'
           required
         />
       )}
@@ -78,6 +79,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         autoComplete="email"
         value={formData.email}
         onChange={handleChange}
+        placeholder='Email'
         required
       />
 
@@ -90,6 +92,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         onChange={handleChange}
         required
         minLength={6}
+        placeholder='Password'
       />
 
       {mode === 'login' && (

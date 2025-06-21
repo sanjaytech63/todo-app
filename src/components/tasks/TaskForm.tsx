@@ -58,6 +58,7 @@ const TaskForm = ({ onAddTask, onCancel }: TaskFormProps) => {
               type="date"
               value={newTask.dueDate}
               onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+              placeholder="Due Date"
             />
           </div>
           <div>
