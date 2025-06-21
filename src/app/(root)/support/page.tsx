@@ -48,7 +48,7 @@ const Support = () => {
                     <div className="max-w-3xl mx-auto text-center">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Still need help?</h2>
                         <p className="text-gray-600 mb-6">
-                            Can't find what you're looking for? Our team is happy to help you with any questions you may have.
+                            Can not find what you are looking for? Our team is happy to help you with any questions you may have.
                         </p>
                         <Button
                             onClick={()=>router.push("/contact")}

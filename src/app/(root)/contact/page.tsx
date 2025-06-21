@@ -102,7 +102,7 @@ export default function ContactPage() {
             {isSubmitted ? (
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className="text-xl font-medium text-green-800 mb-2">Message Sent!</h3>
-                <p className="text-green-600">We'll get back to you soon.</p>
+                <p className="text-green-600">Well get back to you soon.</p>
                 <button
                   onClick={() => setIsSubmitted(false)}
                   className="mt-4 px-4 py-2 bg-green-700 text-white rounded-md cursor-pointer hover:bg-green-800 transition-colors"

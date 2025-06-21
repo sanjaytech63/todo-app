@@ -1,7 +1,5 @@
-import { FiCheck, FiTrash2, FiCalendar, FiTag } from 'react-icons/fi';
 import TaskItem from './TaskItem';
-import type { Task } from '../../constants/tasks';
-import { priorityOptions, statusOptions } from '../../constants/tasks';
+import type { Task } from '@/constants/tasks';
 
 interface TaskListProps {
   tasks: Task[];

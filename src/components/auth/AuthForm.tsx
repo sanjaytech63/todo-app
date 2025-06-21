@@ -29,7 +29,6 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     setError('');
 
     try {
-      // Replace with actual API call
       const response = await fetch(`/api/auth/${mode}`, {
         method: 'POST',
         headers: {
@@ -42,7 +41,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         throw new Error('Authentication failed');
       }
 
-      const data = await response.json();
+      // const data = await response.json();
       router.push('/dashboard');
     } catch (err) {
       setError((err as Error).message || 'Something went wrong');
