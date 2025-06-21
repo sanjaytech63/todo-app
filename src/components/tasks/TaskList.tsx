@@ -1,11 +1,12 @@
+import { TaskStatus } from '@/imports';
 import TaskItem from './TaskItem';
-import type { Task } from '@/constants/tasks';
+import type { Task, } from '@/constants/tasks';
 
 interface TaskListProps {
   tasks: Task[];
-  filter: { status?: string; category?: string };
+  filter: { status?: TaskStatus; category?: string };
   onDeleteTask: (id: string) => void;
-  onStatusChange: (id: string, status: string) => void;
+  onStatusChange: (id: string, status: TaskStatus) => void;
 }
 
 const TaskList = ({ tasks, filter, onDeleteTask, onStatusChange }: TaskListProps) => {

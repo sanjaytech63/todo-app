@@ -1,16 +1,22 @@
 import { FiCheck, FiTrash2, FiCalendar, FiTag } from 'react-icons/fi';
-import type { Task } from '../../constants/tasks';
-import { priorityOptions, statusOptions } from '../../constants/tasks';
+import type { Task } from '@/constants/tasks';
+import { priorityOptions, statusOptions } from '@/constants/tasks';
+import { TaskStatus } from '@/imports';
 
 interface TaskItemProps {
   task: Task;
   onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: string) => void;
+  onStatusChange: (id: string, status: TaskStatus) => void;
 }
 
 const TaskItem = ({ task, onDelete, onStatusChange }: TaskItemProps) => {
   const priority = priorityOptions.find(p => p.value === task.priority);
   const status = statusOptions.find(s => s.value === task.status);
+
+  const handleStatusToggle = () => {
+    const newStatus: TaskStatus = task.status === 'completed' ? 'todo' : 'completed';
+    onStatusChange(task.id, newStatus);
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-indigo-500">
@@ -47,7 +53,7 @@ const TaskItem = ({ task, onDelete, onStatusChange }: TaskItemProps) => {
         </div>
         <div className="flex space-x-2">
           <button
-            onClick={() => onStatusChange(task.id, task.status === 'completed' ? 'todo' : 'completed')}
+            onClick={handleStatusToggle}
             className={`p-2 rounded-full ${task.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'} hover:bg-opacity-80 transition`}
             aria-label={task.status === 'completed' ? 'Mark as To Do' : 'Mark as Completed'}
           >
