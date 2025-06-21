@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar, Footer, Loader } from "@/imports";
 import { Suspense } from "react";
+import MaintenanceBanner from "@/components/MaintenanceBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <MaintenanceBanner />
         <Navbar />
         <Suspense fallback={<Loader />}>
           {children}
