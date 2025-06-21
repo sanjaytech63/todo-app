@@ -29,7 +29,7 @@ const MaintenanceBanner = () => {
                     <FaExclamationTriangle className="mr-2 flex-shrink-0" />
                     <div>
                         <span className="font-semibold">Under Maintenance:</span>{' '}
-                        We're performing scheduled maintenance. Some features may be temporarily unavailable.
+                        We are performing scheduled maintenance. Some features may be temporarily unavailable.
                     </div>
                 </div>
                 <button
