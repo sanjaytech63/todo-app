@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import InputField from '../InputField';
 import { useRouter } from 'next/navigation';
-
+import { useAuthStore } from '@/stores/authStore';
+import InputField from '../InputField';
+import Loader from '../Loader';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -16,37 +17,33 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     password: '',
     name: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  const {
+    isLoading,
+    error,
+    login,
+    register,
+    clearError
+  } = useAuthStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (error) clearError();
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
 
     try {
-      const response = await fetch(`/api/auth/${mode}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Authentication failed');
+      if (mode === 'login') {
+        await login(formData.email, formData.password);
+      } else {
+        await register(formData.name, formData.email, formData.password);
       }
+      router.push('/');
+    } catch (error) {
+      console.log(error, "authntications");
 
-      // const data = await response.json();
-      router.push('/dashboard');
-    } catch (err) {
-      setError((err as Error).message || 'Something went wrong');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -67,7 +64,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           type="text"
           value={formData.name}
           onChange={handleChange}
-          placeholder='Full name'
+          placeholder="Full name"
           required
         />
       )}
@@ -79,7 +76,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         autoComplete="email"
         value={formData.email}
         onChange={handleChange}
-        placeholder='Email'
+        placeholder="Email"
         required
       />
 
@@ -92,7 +89,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         onChange={handleChange}
         required
         minLength={6}
-        placeholder='Password'
+        placeholder="Password"
       />
 
       {mode === 'login' && (
@@ -121,11 +118,14 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full flex justify-center cursor-pointer py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+          className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
             }`}
         >
           {isLoading ? (
-            'Processing...'
+            <div className="flex items-center gap-2" aria-live="polite" aria-busy={isLoading}>
+              <Loader />
+              <span>{mode === "register" ? "Registering..." : "Logging in..."}</span>
+            </div>
           ) : mode === 'login' ? (
             'Sign in'
           ) : (

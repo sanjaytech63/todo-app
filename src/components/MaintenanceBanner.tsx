@@ -28,7 +28,7 @@ const MaintenanceBanner = () => {
                 </div>
                 <button
                     onClick={handleClose}
-                    className="text-white hover:text-gray-100 ml-4 p-1 transition-colors focus:outline-none"
+                    className="text-white hover:text-gray-100 cursor-pointer ml-4 p-1 transition-colors focus:outline-none"
                     aria-label="Dismiss maintenance banner"
                 >
                     <FaTimes />

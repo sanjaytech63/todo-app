@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { Navbar, Footer, Loader } from "@/imports";
 import { Suspense } from "react";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
+import { ToastContainer } from "react-toastify";
+import { AuthInitializer } from "@/components/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +34,9 @@ export default function RootLayout({
         <MaintenanceBanner />
         <Navbar />
         <Suspense fallback={<Loader />}>
+          <AuthInitializer />
           {children}
+          <ToastContainer />
         </Suspense>
         <Footer />
       </body>

@@ -7,6 +7,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { navLinks } from '@/constants/navigation';
 import { Button } from '@/imports';
+import { useAuthStore } from '@/stores/authStore';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,10 @@ const Navbar = () => {
     const [isMounted, setIsMounted] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
+    const { user, logout } = useAuthStore();
+
+    console.log(user?.name);
+    
 
     useEffect(() => {
         setIsMounted(true);
@@ -43,6 +48,7 @@ const Navbar = () => {
     if (!isMounted) {
         return null;
     }
+
 
     return (
         <nav className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 fixed top-0 left-0 z-50 ">
@@ -106,13 +112,31 @@ const Navbar = () => {
                                 {darkMode ? <FaSun className="w-5 h-5" /> : <FaMoon className="w-5 h-5" />}
                             </button>
 
-                            <Button onClick={() => router.push("/login")} className='text-sm'>
-                                Sign in
-                            </Button>
-
-                            <Button onClick={() => router.push("/task")} className='text-sm'>
-                                New Task
-                            </Button>
+                            {user ? (
+                                <div className='flex items-center gap-2'>
+                                    <Button onClick={() => router.push("/task")} className='text-sm'>
+                                        Add Task
+                                    </Button>
+                                    <Button
+                                        onClick={async () => {
+                                            await logout();
+                                            router.push("/");
+                                        }}
+                                        className='text-sm'
+                                    >
+                                        Logout
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className='flex items-center gap-2'>
+                                    <Button onClick={() => router.push("/register")} className='text-sm'>
+                                        Sign Up
+                                    </Button>
+                                    <Button onClick={() => router.push("/login")} className='text-sm'>
+                                        Sign In
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -213,20 +237,36 @@ const Navbar = () => {
                                 </button>
                             </div>
 
-                           <div className='flex gap-4 items-center'>
-                             <Button onClick={() => router.push("/task")} className='text-sm'>
-                                New Task
-                            </Button>
-
-                            <Button onClick={() => router.push("/login")} className='text-sm'>
-                                Sign in
-                            </Button>
-                           </div>
+                            {user ? (
+                                <div className='flex items-center gap-2'>
+                                    <Button onClick={() => router.push("/task")} className='text-sm'>
+                                        Add Task
+                                    </Button>
+                                    <Button
+                                        onClick={async () => {
+                                            await logout();
+                                            router.push("/");
+                                        }}
+                                        className='text-sm'
+                                    >
+                                        Logout
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className='flex items-center gap-2'>
+                                    <Button onClick={() => router.push("/register")} className='text-sm'>
+                                        Sign Up
+                                    </Button>
+                                    <Button onClick={() => router.push("/login")} className='text-sm'>
+                                        Sign In
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-        </nav>
+        </nav >
     );
 };
 
