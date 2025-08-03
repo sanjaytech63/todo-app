@@ -1,34 +1,66 @@
 import { NextResponse } from 'next/server';
-import User from '@/app/models/User';
+import { signAccessToken, signRefreshToken } from '@/app/lib/jwt';
 import dbConnect from '@/app/lib/db/connect';
-import { createSession } from '@/app/lib/auth/actions';
+import User from '@/app/models/User';
+import { serialize } from 'cookie';
 
-export async function POST(request: Request) {
+interface RegisterBody {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+export async function POST(req: Request) {
+  const body: RegisterBody = await req.json();
+  const { fullName, email, password } = body;
+
+  if (!fullName || !email || !password) {
+    return NextResponse.json(
+      { error: 'All fields (fullName, email, password) are required.' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const { name, email, password } = await request.json();
     await dbConnect();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'Email already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      provider: 'credentials',
+    const newUser = await User.create({ fullName, email, password });
+
+    const accessToken = signAccessToken({ userId: newUser._id });
+    const refreshToken = signRefreshToken({ userId: newUser._id });
+
+    const response = NextResponse.json({
+      user: { id: newUser._id, fullName: newUser.fullName, email: newUser.email },
     });
 
-    await createSession(user._id.toString());
-    return NextResponse.json({ user });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Registration failed' },
-      { status: 500 }
+    // Set cookies manually using `cookie` header
+    response.headers.append(
+      'Set-Cookie',
+      serialize('accessToken', accessToken, {
+        httpOnly: true,
+        secure: true,
+        path: '/',
+        maxAge: 60 * 15, // 15 minutes
+      })
     );
+    response.headers.append(
+      'Set-Cookie',
+      serialize('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      })
+    );
+
+    return response;
+  } catch (err: any) {
+    console.error('Register Error:', err);
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
   }
 }

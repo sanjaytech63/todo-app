@@ -1,18 +1,16 @@
 import mongoose, { Mongoose } from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
+const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI as string
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
 }
 
-// Type for cached connection
 interface CachedConnection {
   conn: Mongoose | null;
   promise: Promise<Mongoose> | null;
 }
 
-// Extend global type
 declare global {
   var mongoose: CachedConnection;
 }

@@ -8,7 +8,6 @@ import CTA from '@/components/CTA';
 import AuthForm from '@/components/auth/AuthForm';
 import InputField from '@/components/InputField';
 import TextAreaField from '@/components/TextAreaField';
-import SocialAuth from '@/components/auth/SocialAuth';
 import HeroSection from '@/components/about/HeroSection';
 import StorySection from '@/components/about/StorySection';
 import ValuesSection from '@/components/about/ValuesSection';
@@ -42,7 +41,6 @@ export {
     Features,
     CTA,
     AuthForm,
-    SocialAuth,
     InputField,
     HeroSection,
     StorySection,

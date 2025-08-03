@@ -1,4 +1,4 @@
-import { AuthForm, SocialAuth } from '@/imports';
+import { AuthForm } from '@/imports';
 import Link from 'next/link';
 
 const RegisterPage = () => {
@@ -8,7 +8,6 @@ const RegisterPage = () => {
         <div className="bg-white  px-4 shadow-sm rounded-xl sm:px-10">
           <h2 className="mt-6 text-3xl  font-extrabold py-6 text-gray-900">Sign up</h2>
           <AuthForm mode="register" />
-          <SocialAuth />
           <div className="text-center flex justify-center items-center py-6">
             <p className="mt-2 flex gap-1.5 text-sm  text-gray-600">
               <span> Or</span>

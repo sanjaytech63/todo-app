@@ -6,7 +6,7 @@ import { Navbar, Footer, Loader } from "@/imports";
 import { Suspense } from "react";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
 import { ToastContainer } from "react-toastify";
-import { AuthInitializer } from "@/components/AuthInitializer";
+import Initialize from "@/stores/inslize";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,10 +33,11 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <MaintenanceBanner />
         <Navbar />
+        <ToastContainer />
         <Suspense fallback={<Loader />}>
-          <AuthInitializer />
-          {children}
-          <ToastContainer />
+          <Initialize>
+            {children}
+          </Initialize>
         </Suspense>
         <Footer />
       </body>

@@ -1,28 +1,28 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getSession } from '@/app/lib/auth/actions';
+import { verifyAccessToken } from '@/app/lib/jwt'; 
 
-export async function middleware(request: NextRequest) {
-  const session = await getSession();
-  const { pathname } = request.nextUrl;
+export function middleware(request: NextRequest) {
+  const accessToken = request.cookies.get('accessToken')?.value;
 
-  // Protected routes
-  const protectedRoutes = ['/dashboard'];
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  // Auth routes
-  const authRoutes = ['/login', '/register'];
-  const isAuthRoute = authRoutes.includes(pathname);
-
-  if (isProtected && !session) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (!accessToken) {
+    return redirectToLogin(request);
   }
 
-  if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  try {
+    verifyAccessToken(accessToken);
+    return NextResponse.next();
+  } catch (err) {
+    return redirectToLogin(request);
   }
-
-  return NextResponse.next();
 }
+
+function redirectToLogin(request: NextRequest) {
+  const loginUrl = new URL('/login', request.url);
+  loginUrl.searchParams.set('from', request.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*'],
+};

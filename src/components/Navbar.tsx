@@ -15,17 +15,22 @@ const Navbar = () => {
     const [isMounted, setIsMounted] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
-    const { user, logout } = useAuthStore();
-
-    console.log(user?.name);
-    
-
+    const {
+        user,
+        isAuthenticated,
+        logout,
+        initialize,
+        error,
+        clearError
+    } = useAuthStore();
+  
     useEffect(() => {
         setIsMounted(true);
         const savedTheme = localStorage.getItem('theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         setDarkMode(savedTheme ? savedTheme === 'dark' : prefersDark);
-    }, []);
+        initialize();
+    }, [initialize]);
 
     useEffect(() => {
         if (isMounted) {
@@ -39,19 +44,28 @@ const Navbar = () => {
         }
     }, [darkMode, isMounted]);
 
-    const toggleTheme = () => setDarkMode((prev) => !prev);
-
     useEffect(() => {
         setIsMenuOpen(false);
     }, [pathname]);
+
+    const toggleTheme = () => setDarkMode((prev) => !prev);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
 
     if (!isMounted) {
         return null;
     }
 
-
     return (
-        <nav className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 fixed top-0 left-0 z-50 ">
+        <nav className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 fixed top-0 left-0 z-50">
+            {/* Desktop Navbar */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
@@ -92,8 +106,8 @@ const Navbar = () => {
                                     key={link.name}
                                     href={link.href}
                                     className={`relative px-3 py-2 rounded-md text-sm font-medium ${pathname === link.href
-                                        ? 'text-indigo-600 dark:text-indigo-400'
-                                        : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+                                            ? 'text-indigo-600 dark:text-indigo-400'
+                                            : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400'
                                         } transition-colors`}
                                 >
                                     {link.name}
@@ -112,23 +126,20 @@ const Navbar = () => {
                                 {darkMode ? <FaSun className="w-5 h-5" /> : <FaMoon className="w-5 h-5" />}
                             </button>
 
-                            {user ? (
-                                <div className='flex items-center gap-2'>
+                            {isAuthenticated ? (
+                                <div className='flex items-center gap-4'>
                                     <Button onClick={() => router.push("/task")} className='text-sm'>
                                         Add Task
                                     </Button>
                                     <Button
-                                        onClick={async () => {
-                                            await logout();
-                                            router.push("/");
-                                        }}
+                                        onClick={handleLogout}
                                         className='text-sm'
                                     >
                                         Logout
                                     </Button>
                                 </div>
                             ) : (
-                                <div className='flex items-center gap-2'>
+                                <div className='flex items-center gap-4'>
                                     <Button onClick={() => router.push("/register")} className='text-sm'>
                                         Sign Up
                                     </Button>
@@ -140,6 +151,7 @@ const Navbar = () => {
                         </div>
                     </div>
 
+                    {/* Mobile menu button */}
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -158,7 +170,7 @@ const Navbar = () => {
                     }`}
             >
                 <div
-                    className="fixed inset-0 bg-black/50 "
+                    className="fixed inset-0 bg-black/50"
                     onClick={() => setIsMenuOpen(false)}
                 />
                 <div
@@ -174,7 +186,7 @@ const Navbar = () => {
                                     aria-label="Home"
                                     passHref
                                 >
-                                    <div className="bg-indigo-600 dark:bg-indigo-700 p-2 rounded-lg group-hover:bg-indigo-700 dark:group-hover:bg-indigo-600 transition-colors duration-300">
+                                    <div className="bg-indigo-600 dark:bg-indigo-700 p-2 rounded-lg">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-6 w-6 text-white"
@@ -190,7 +202,7 @@ const Navbar = () => {
                                             />
                                         </svg>
                                     </div>
-                                    <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors duration-300">
+                                    <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
                                         Todo App
                                     </span>
                                 </Link>
@@ -210,8 +222,8 @@ const Navbar = () => {
                                     key={link.name}
                                     href={link.href}
                                     className={`block px-3 py-2 rounded-md text-base font-medium ${pathname === link.href
-                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-gray-700'
-                                        : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-gray-700'
+                                            : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                         } transition-colors`}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
@@ -237,27 +249,45 @@ const Navbar = () => {
                                 </button>
                             </div>
 
-                            {user ? (
-                                <div className='flex items-center gap-2'>
-                                    <Button onClick={() => router.push("/task")} className='text-sm'>
+                            {isAuthenticated ? (
+                                <div className='flex flex-col gap-2'>
+                                    <Button
+                                        onClick={() => {
+                                            router.push("/task");
+                                            setIsMenuOpen(false);
+                                        }}
+                                        className='w-full text-sm'
+                                    >
                                         Add Task
                                     </Button>
                                     <Button
                                         onClick={async () => {
-                                            await logout();
-                                            router.push("/");
+                                            await handleLogout();
+                                            setIsMenuOpen(false);
                                         }}
-                                        className='text-sm'
+                                        className='w-full text-sm'
                                     >
                                         Logout
                                     </Button>
                                 </div>
                             ) : (
-                                <div className='flex items-center gap-2'>
-                                    <Button onClick={() => router.push("/register")} className='text-sm'>
+                                <div className='flex flex-col gap-4'>
+                                    <Button
+                                        onClick={() => {
+                                            router.push("/register");
+                                            setIsMenuOpen(false);
+                                        }}
+                                        className='w-full text-sm'
+                                    >
                                         Sign Up
                                     </Button>
-                                    <Button onClick={() => router.push("/login")} className='text-sm'>
+                                    <Button
+                                        onClick={() => {
+                                            router.push("/login");
+                                            setIsMenuOpen(false);
+                                        }}
+                                        className='w-full text-sm'
+                                    >
                                         Sign In
                                     </Button>
                                 </div>
@@ -266,7 +296,7 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-        </nav >
+        </nav>
     );
 };
 

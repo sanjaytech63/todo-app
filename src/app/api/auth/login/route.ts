@@ -1,24 +1,11 @@
 import { NextResponse } from 'next/server';
-import { verifyCredentials, createSession } from '@/app/lib/auth/actions';
-
-export async function POST(request: Request) {
+import { loginUser } from '@/app/lib/auth';
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
   try {
-    const { email, password } = await request.json();
-    const user = await verifyCredentials(email, password);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      );
-    }
-
-    await createSession(user._id.toString());
+    const { user } = await loginUser(email, password);
     return NextResponse.json({ user });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Login failed' },
-      { status: 500 }
-    );
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 401 });
   }
 }

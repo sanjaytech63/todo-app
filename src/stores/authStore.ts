@@ -1,106 +1,146 @@
 import { create } from 'zustand';
-import api from '@/app/utils/api';
-import { showErrorToast, showSuccessToast } from '@/app/utils/toast';
+import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
 interface User {
-    id: string;
-    name: string;
-    email: string;
-    provider?: string;
+  id: string;
+  email: string;
+  name?: string;
+}
+interface RegisterParams {
+  fullName: string;
+  email: string;
+  password: string;
+}
+interface LoginParams {
+  email: string;
+  password: string;
 }
 
 interface AuthState {
-    user: User | null;
-    isLoading: boolean;
-    error: string | null;
-    login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string) => Promise<void>;
-    logout: () => Promise<void>;
-    checkSession: () => Promise<void>;
-    clearError: () => void;
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+  login: (params: LoginParams) => Promise<void>;
+  register: (params: RegisterParams) => Promise<void>;
+  logout: () => Promise<void>;
+  initialize: () => Promise<void>;
+  clearError: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-    user: null,
-    isLoading: false,
-    error: null,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      isLoading: false,
+      error: null,
+      isAuthenticated: false,
 
-    login: async (email, password) => {
+      login: async ({email, password}) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await api.post('/login', { email, password });
+          const res = await axios.post('/api/auth/login', { email, password });
 
-            if (response.status !== 200) {
-                return showErrorToast("Login failed. Please try again.");
-            }
-
-            if (response.status === 200) {
-                return showSuccessToast("Login Successfully!");
-            }
-
-            set({ user: response.data.user });
+          if (res.data.user) {
+            set({
+              user: res.data.user,
+              isLoading: false,
+              isAuthenticated: true,
+              error: null
+            });
+          } else {
+            throw new Error('Invalid response from server');
+          }
         } catch (error: any) {
-            set({ error: error.message || 'Login failed' });
-            throw error;
-        } finally {
-            set({ isLoading: false });
-        }
-    },
+          let errorMessage = 'Login failed. Please try again.';
 
-    register: async (name, email, password) => {
+          if (axios.isAxiosError(error)) {
+            errorMessage = error.response?.data?.error ||
+              error.response?.data?.message ||
+              errorMessage;
+          }
+
+          set({ error: errorMessage, isLoading: false });
+          throw error;
+        }
+      },
+
+      register: async ({fullName, email, password}) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await api.post('/register', { name, email, password });
+          const res = await axios.post('/api/auth/register', { fullName, email, password });
 
-            if (response.status !== 200) {
-                return showErrorToast("Registration failed. Please try again.");
-            }
-
-            if (response.status === 200) {
-                return showSuccessToast("Register Successfully!");
-            }
-
-            set({ user: response.data.user });
-
+          if (res.data.user) {
+            set({
+              user: res.data.user,
+              isLoading: false,
+              isAuthenticated: true,
+              error: null
+            });
+          } else {
+            throw new Error('Invalid response from server');
+          }
         } catch (error: any) {
-            set({ error: error.message || 'Registration failed' });
-            throw error;
-        } finally {
-            set({ isLoading: false });
+          let errorMessage = 'Registration failed. Please try again.';
+
+          if (axios.isAxiosError(error)) {
+            errorMessage = error.response?.data?.error ||
+              error.response?.data?.message ||
+              errorMessage;
+
+            // Handle duplicate email case
+            if (error.response?.status === 409) {
+              errorMessage = 'Email already exists. Please use a different email.';
+            }
+          }
+
+          set({ error: errorMessage, isLoading: false });
+          throw error;
         }
-    },
+      },
 
-    logout: async () => {
-        set({ isLoading: true });
+      logout: async () => {
         try {
-            const response = await api.post('/logout');
-            if (response.status !== 200) {
-                return showErrorToast("Logout failed. Please try again.");
-            }
-
-            if (response.status === 200) {
-                return showSuccessToast("Logout Successfully!");
-            }
-
-            set({ user: null });
-        } catch (error: any) {
-            set({ error: error.message || 'Logout failed' });
-            throw error;
-        } finally {
-            set({ isLoading: false });
-        }
-    },
-
-    checkSession: async () => {
-        try {
-            const response = await api.get('/session');
-            if (response.data?.user) {
-                set({ user: response.data.user });
-            }
+          set({ isLoading: true });
+          await axios.post('/api/auth/logout');
         } catch (error) {
-            // Silent error - session might not exist
+          console.error('Logout error:', error);
+        } finally {
+          set({
+            user: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
         }
-    },
+      },
 
-    clearError: () => set({ error: null }),
-}));
+      initialize: async () => {
+        try {
+          set({ isLoading: true });
+          const res = await axios.get('/api/auth/session');
+
+          if (res.data.user) {
+            set({
+              user: res.data.user,
+              isAuthenticated: true,
+              isLoading: false
+            });
+          }
+        } catch (error) {
+          console.error('Session initialization failed:', error);
+          set({ isLoading: false });
+        }
+      },
+
+      clearError: () => set({ error: null }),
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated
+      }),
+    }
+  )
+);
