@@ -72,15 +72,20 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      // In a real app, you would call an API here
-      // await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!res.ok) {
+        const data = await res.json();
+        console.error('Validation errors:', data.error);
+        return setErrors(prev => ({
+          ...prev,
+          ...(data.error || {})
+        }));
+      }
 
       setIsSubmitted(true);
       setFormData({ name: '', email: '', message: '' });

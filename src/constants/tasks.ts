@@ -4,10 +4,9 @@ export interface Task {
   description: string;
   dueDate: string;
   priority: 'low' | 'medium' | 'high';
-  status: 'todo' | 'in-progress' | 'completed';
+  status: 'pending' | 'in-progress' | 'completed';
   category: string;
 }
-
 export const initialTasks: Task[] = [
   {
     id: '1',
@@ -24,7 +23,7 @@ export const initialTasks: Task[] = [
     description: 'Milk, eggs, bread, fruits',
     dueDate: '2023-06-10',
     priority: 'medium',
-    status: 'todo',
+    status: 'pending',
     category: 'Personal'
   },
   {

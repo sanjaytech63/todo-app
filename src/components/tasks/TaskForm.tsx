@@ -17,7 +17,7 @@ const TaskForm = ({ onAddTask, onCancel }: TaskFormProps) => {
     description: '',
     dueDate: '',
     priority: 'medium',
-    status: 'todo',
+    status: 'pending', 
     category: 'Personal'
   });
 
@@ -91,7 +91,7 @@ const TaskForm = ({ onAddTask, onCancel }: TaskFormProps) => {
           >
             Cancel
           </button>
-          <Button type="submit" >
+          <Button type="submit">
             <FiPlus className="mr-2" />
             Add Task
           </Button>

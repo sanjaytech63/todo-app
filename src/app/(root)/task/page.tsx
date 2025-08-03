@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from 'react';
-import { Task, initialTasks, TaskFilters, TaskForm, TaskList, Button, TaskStatus } from '@/imports';
+import { useEffect, useState } from "react";
+import {
+  Task,
+  TaskStatus,
+  TaskFilters,
+  TaskForm,
+  TaskList,
+  Button,
+} from "@/imports";
+import { showSuccessToast } from "@/app/utils/toast";
 
 interface TaskFilter {
   status?: TaskStatus;
@@ -9,32 +17,77 @@ interface TaskFilter {
 }
 
 const TaskManager = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [filter, setFilter] = useState<TaskFilter>({});
 
-  const handleAddTask = (task: Omit<Task, 'id'>) => {
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await fetch("/api/tasks");
+        const data = await res.json();
+        setTasks(data.tasks || []);
+      } catch (error) {
+        console.error("Failed to fetch tasks", error);
+      }
+    };
+    fetchTasks();
+  }, []);
+
+  const handleAddTask = async (task: Omit<Task, "id">) => {
     if (!task.title.trim()) return;
 
-    const newTask: Task = {
-      ...task,
-      id: Date.now().toString()
-    };
-
-    setTasks(prevTasks => [...prevTasks, newTask]);
-    setIsAdding(false);
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(task),
+      });
+      const response = await res.json();
+      if (response.success) {
+        setTasks((prev) => [...prev, response.task]);
+        showSuccessToast('Task added successfully!');
+      }
+      setIsAdding(false);
+    } catch (error) {
+      console.error("Failed to add task", error);
+    }
   };
 
-  const handleDeleteTask = (id: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+  const handleDeleteTask = async (id: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "DELETE",
+      });
+      const response = await res.json();
+      if (response.success) {
+        setTasks((prev) => prev.filter((task) => task.id !== id));
+        showSuccessToast('Task added successfully!');
+      }
+    } catch (error) {
+      console.error("Failed to delete task", error);
+    }
   };
 
-  const handleStatusChange = (id: string, status: TaskStatus) => {
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
-        task.id === id ? { ...task, status } : task
-      )
-    );
+  const handleStatusChange = async (id: string, status: TaskStatus) => {
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const updatedTask = await res.json();
+
+      if (updatedTask.success) {
+        setTasks((prev) =>
+          prev.map((task) => (task.id === id ? updatedTask : task))
+        );
+        showSuccessToast('Task added successfully!');
+      }
+
+    } catch (error) {
+      console.error("Failed to update task", error);
+    }
   };
 
   return (
@@ -42,19 +95,12 @@ const TaskManager = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Task Manager</h1>
-          <Button
-            onClick={() => setIsAdding(true)}
-            className="text-sm"
-            aria-label="Add new task"
-          >
+          <Button onClick={() => setIsAdding(true)} className="text-sm">
             Add Task
           </Button>
         </div>
 
-        <TaskFilters
-          filter={filter}
-          setFilter={setFilter}
-        />
+        <TaskFilters filter={filter} setFilter={setFilter} />
 
         {isAdding && (
           <TaskForm
