@@ -97,9 +97,13 @@ const TaskManager = () => {
       );
 
       showSuccessToast("Task updated successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update task", error);
-      showErrorToast(error.message || "Failed to update task");
+
+      const message =
+        error instanceof Error ? error.message : "Failed to update task";
+
+      showErrorToast(message);
     }
   };
 

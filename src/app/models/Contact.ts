@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, models, model } from 'mongoose';
+import { Schema, Document, models, model } from 'mongoose';
 
 export interface IContact extends Document {
   name: string;

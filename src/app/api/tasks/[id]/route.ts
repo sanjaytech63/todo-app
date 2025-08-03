@@ -27,11 +27,9 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true, task: updatedTask });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error?.message || "Internal Server Error" },
-      { status: 500 }
-    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -54,10 +52,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true, message: "Task deleted" });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, error: error?.message || "Internal Server Error" },
-      { status: 500 }
-    );
+  }catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Internal Server Error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

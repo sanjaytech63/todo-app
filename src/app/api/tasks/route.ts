@@ -9,11 +9,9 @@ export async function GET() {
 
         const tasks = await Task.find().sort({ createdAt: -1 }); // Sort latest first
         return NextResponse.json({ success: true, tasks });
-    } catch (error: any) {
-        return NextResponse.json(
-            { success: false, error: error?.message || "Internal Server Error" },
-            { status: 500 }
-        );
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -27,10 +25,8 @@ export async function POST(req: Request) {
 
         const newTask = await Task.create(parsed);
         return NextResponse.json({ success: true, task: newTask }, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json(
-            { success: false, error: error?.message || "Internal Server Error" },
-            { status: 500 }
-        );
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Internal Server Error';
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

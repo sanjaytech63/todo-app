@@ -1,6 +1,6 @@
-import  contactFormSchema  from '@/app/lib/validations/contact';
+import contactFormSchema from '@/app/lib/validations/contact';
 import { NextResponse } from 'next/server';
-import dbConnect from '@/app/lib/db/connect'; 
+import dbConnect from '@/app/lib/db/connect';
 import Contact from '@/app/models/Contact';
 
 export async function POST(req: Request) {
@@ -15,15 +15,13 @@ export async function POST(req: Request) {
       );
     }
 
-    await dbConnect(); 
+    await dbConnect();
 
     await Contact.create(parsed.data);
 
     return NextResponse.json({ message: 'Message saved!' });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Something went wrong' },
-      { status: 500 }
-    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
