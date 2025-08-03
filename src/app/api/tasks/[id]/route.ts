@@ -34,12 +34,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await dbConnect();
 
-    const { id } = params;
+    const { id } = context.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
@@ -51,7 +51,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true, message: "Task deleted" });
-  }catch (e: unknown) {
+  } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Internal Server Error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
