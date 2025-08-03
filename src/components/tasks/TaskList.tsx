@@ -6,15 +6,21 @@ interface TaskListProps {
   tasks: Task[];
   filter: { status?: TaskStatus; category?: string };
   onDeleteTask: (id: string) => void;
-  onStatusChange: (id: string, status: TaskStatus) => void;
+  onStatusChange: (_id: string, status: TaskStatus) => void;
+   isLoading: boolean;
 }
 
-const TaskList = ({ tasks, filter, onDeleteTask, onStatusChange }: TaskListProps) => {
+const TaskList = ({ tasks, filter, onDeleteTask, onStatusChange,isLoading }: TaskListProps) => {
   const filteredTasks = tasks.filter(task => {
     if (filter.status && task.status !== filter.status) return false;
     if (filter.category && task.category !== filter.category) return false;
     return true;
   });
+
+
+  if (isLoading) {
+    return <div className="text-center text-gray-500 py-8">Loading tasks...</div>;
+  }
 
   if (filteredTasks.length === 0) {
     return (
@@ -28,7 +34,7 @@ const TaskList = ({ tasks, filter, onDeleteTask, onStatusChange }: TaskListProps
     <div className="space-y-4">
       {filteredTasks.map((task) => (
         <TaskItem
-          key={task.id}
+          key={task._id}
           task={task}
           onDelete={onDeleteTask}
           onStatusChange={onStatusChange}

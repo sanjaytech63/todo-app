@@ -9,7 +9,7 @@ import {
   TaskList,
   Button,
 } from "@/imports";
-import { showSuccessToast } from "@/app/utils/toast";
+import { showSuccessToast, showErrorToast } from "@/app/utils/toast";
 
 interface TaskFilter {
   status?: TaskStatus;
@@ -20,15 +20,20 @@ const TaskManager = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [filter, setFilter] = useState<TaskFilter>({});
+  const [isLoading, setIsLoading] = useState(true); // ⬅️ loading state
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
+        setIsLoading(true); // ⬅️ start loading
         const res = await fetch("/api/tasks");
         const data = await res.json();
         setTasks(data.tasks || []);
       } catch (error) {
         console.error("Failed to fetch tasks", error);
+        showErrorToast("Error loading tasks");
+      } finally {
+        setIsLoading(false); // ⬅️ end loading
       }
     };
     fetchTasks();
@@ -46,26 +51,28 @@ const TaskManager = () => {
       const response = await res.json();
       if (response.success) {
         setTasks((prev) => [...prev, response.task]);
-        showSuccessToast('Task added successfully!');
+        showSuccessToast("Task added successfully!");
       }
       setIsAdding(false);
     } catch (error) {
       console.error("Failed to add task", error);
+      showErrorToast("Failed to add task");
     }
   };
 
-  const handleDeleteTask = async (id: string) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
-      const res = await fetch(`/api/tasks/${id}`, {
+      const res = await fetch(`/api/tasks/${taskId}`, {
         method: "DELETE",
       });
       const response = await res.json();
       if (response.success) {
-        setTasks((prev) => prev.filter((task) => task.id !== id));
-        showSuccessToast('Task added successfully!');
+        setTasks((prev) => prev.filter((task) => task._id !== taskId));
+        showSuccessToast("Task deleted successfully!");
       }
     } catch (error) {
       console.error("Failed to delete task", error);
+      showErrorToast("Failed to delete task");
     }
   };
 
@@ -73,20 +80,26 @@ const TaskManager = () => {
     try {
       const res = await fetch(`/api/tasks/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ status }),
       });
+
       const updatedTask = await res.json();
 
-      if (updatedTask.success) {
-        setTasks((prev) =>
-          prev.map((task) => (task.id === id ? updatedTask : task))
-        );
-        showSuccessToast('Task added successfully!');
+      if (!res.ok) {
+        throw new Error(updatedTask.message || "Failed to update task");
       }
 
-    } catch (error) {
+      setTasks((prev) =>
+        prev.map((task) => (task._id === id ? updatedTask.task : task))
+      );
+
+      showSuccessToast("Task updated successfully!");
+    } catch (error: any) {
       console.error("Failed to update task", error);
+      showErrorToast(error.message || "Failed to update task");
     }
   };
 
@@ -112,6 +125,7 @@ const TaskManager = () => {
         <TaskList
           tasks={tasks}
           filter={filter}
+          isLoading={isLoading}
           onDeleteTask={handleDeleteTask}
           onStatusChange={handleStatusChange}
         />

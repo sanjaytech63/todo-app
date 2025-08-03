@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/app/lib/db/connect";
 import Task from "@/app/models/Task";
+import mongoose from "mongoose";
 
 export async function PATCH(
   req: NextRequest,
@@ -9,8 +10,14 @@ export async function PATCH(
   try {
     await dbConnect();
 
+    const { id } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
+    }
+
     const body = await req.json();
-    const updatedTask = await Task.findByIdAndUpdate(params.id, body, {
+    const updatedTask = await Task.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -28,7 +35,6 @@ export async function PATCH(
   }
 }
 
-// ✅ DELETE /api/task/[id] — Delete Task
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -36,7 +42,13 @@ export async function DELETE(
   try {
     await dbConnect();
 
-    const deleted = await Task.findByIdAndDelete(params.id);
+    const { id } = params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
+    }
+
+    const deleted = await Task.findByIdAndDelete(id);
     if (!deleted) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }

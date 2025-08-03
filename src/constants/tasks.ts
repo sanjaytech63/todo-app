@@ -1,5 +1,5 @@
 export interface Task {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   dueDate: string;
@@ -7,35 +7,7 @@ export interface Task {
   status: 'pending' | 'in-progress' | 'completed';
   category: string;
 }
-export const initialTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Complete project proposal',
-    description: 'Finish writing the project proposal document',
-    dueDate: '2023-06-15',
-    priority: 'high',
-    status: 'in-progress',
-    category: 'Work'
-  },
-  {
-    id: '2',
-    title: 'Buy groceries',
-    description: 'Milk, eggs, bread, fruits',
-    dueDate: '2023-06-10',
-    priority: 'medium',
-    status: 'pending',
-    category: 'Personal'
-  },
-  {
-    id: '3',
-    title: 'Schedule team meeting',
-    description: '',
-    dueDate: '2023-06-12',
-    priority: 'low',
-    status: 'completed',
-    category: 'Work'
-  }
-];
+export const initialTasks: Task[] = [];
 
 export const taskCategories = [
   'Personal',
@@ -65,8 +37,8 @@ export const priorityOptions = [
 
 export const statusOptions = [
   {
-    value: 'todo',
-    label: 'To Do',
+    value: 'pending',
+    label: 'Pending',
     color: 'bg-gray-500'
   },
   {

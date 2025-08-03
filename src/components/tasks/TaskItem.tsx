@@ -5,8 +5,8 @@ import { TaskStatus } from '@/imports';
 
 interface TaskItemProps {
   task: Task;
-  onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: TaskStatus) => void;
+  onDelete: (_id: string) => void;
+  onStatusChange: (_id: string, status: TaskStatus) => void;
 }
 
 const TaskItem = ({ task, onDelete, onStatusChange }: TaskItemProps) => {
@@ -15,16 +15,16 @@ const TaskItem = ({ task, onDelete, onStatusChange }: TaskItemProps) => {
 
   const handleStatusToggle = () => {
     const newStatus: TaskStatus = task.status === 'completed' ? 'todo' : 'completed';
-    onStatusChange(task.id, newStatus);
+    onStatusChange(task._id, newStatus);
   };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-indigo-500">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-semibold text-lg">{task.title}</h3>
+          <h3 className="font-semibold capitalize text-lg">{task.title}</h3>
           {task.description && (
-            <p className="text-gray-600 mt-1">{task.description}</p>
+            <p className="text-gray-600 capitalize mt-1">{task.description}</p>
           )}
           <div className="flex flex-wrap gap-2 mt-3">
             {priority && (
@@ -60,7 +60,7 @@ const TaskItem = ({ task, onDelete, onStatusChange }: TaskItemProps) => {
             <FiCheck />
           </button>
           <button
-            onClick={() => onDelete(task.id)}
+            onClick={() => onDelete(task._id)}
             className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-opacity-80 transition"
             aria-label="Delete task"
           >
