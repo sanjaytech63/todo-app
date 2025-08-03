@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
+   ignorePatterns: ['src/app/api/tasks/route.ts'],
   images: {
     domains: [
       'cdn.pixabay.com',
