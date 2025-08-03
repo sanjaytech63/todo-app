@@ -2,10 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
-  reactStrictMode: true,
-   ignorePatterns: ['src/app/api/tasks/route.ts'],
   images: {
     domains: [
       'cdn.pixabay.com',
