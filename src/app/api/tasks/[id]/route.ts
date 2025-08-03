@@ -33,21 +33,23 @@ export async function PATCH(
   }
 }
 
-export async function handler(req: Request, context: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await dbConnect();
 
-    const { id } = context.params;
+    const { id } = params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
     }
-    if (req.method === "DELETE") {
 
-      const deleted = await Task.findByIdAndDelete(id);
-      if (!deleted) {
-        return NextResponse.json({ error: "Task not found" }, { status: 404 });
-      }
+     const body = await request.json();
+    const deleted = await body.findByIdAndDelete(id);
+    if (!deleted) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, message: "Task deleted" });
