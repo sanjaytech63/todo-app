@@ -33,28 +33,26 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    await dbConnect();
+// export async function DELETE(
+//   { params }: { params: { id: string } }
+// ) {
+//   try {
+//     await dbConnect();
 
-    const { id } = params;
+//     const { id } = params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
-    }
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid Task ID" }, { status: 400 });
+//     }
+    
+//     const deleted = await Task.findByIdAndDelete(id);
+//     if (!deleted) {
+//       return NextResponse.json({ error: "Task not found" }, { status: 404 });
+//     }
 
-     const body = await request.json();
-    const deleted = await body.findByIdAndDelete(id);
-    if (!deleted) {
-      return NextResponse.json({ error: "Task not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, message: "Task deleted" });
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : 'Internal Server Error';
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
+//     return NextResponse.json({ success: true, message: "Task deleted" });
+//   } catch (e: unknown) {
+//     const message = e instanceof Error ? e.message : 'Internal Server Error';
+//     return NextResponse.json({ error: message }, { status: 500 });
+//   }
+// }
