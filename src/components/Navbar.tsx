@@ -16,12 +16,9 @@ const Navbar = () => {
     const pathname = usePathname();
     const router = useRouter();
     const {
-        user,
         isAuthenticated,
         logout,
         initialize,
-        error,
-        clearError
     } = useAuthStore();
   
     useEffect(() => {

@@ -5,7 +5,8 @@ export async function POST(req: Request) {
   try {
     const { user } = await loginUser(email, password);
     return NextResponse.json({ user });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 401 });
-  }
+  } catch (e: unknown) {
+  const message = e instanceof Error ? e.message : 'Unknown error';
+  return NextResponse.json({ error: message }, { status: 401 });
+}
 }

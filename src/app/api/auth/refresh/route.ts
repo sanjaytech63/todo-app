@@ -1,6 +1,10 @@
 import { cookies } from 'next/headers';
 import { verifyRefreshToken, signAccessToken } from '@/app/lib/jwt';
 
+type JwtPayload = {
+  userId: string;
+};
+
 export async function POST() {
   const cookieStore = await cookies();
   const token = cookieStore.get('refreshToken')?.value;
@@ -10,8 +14,9 @@ export async function POST() {
   }
 
   try {
-    const decoded = verifyRefreshToken(token);
-    const newAccess = signAccessToken({ userId: (decoded as any).userId });
+    
+    const decoded = verifyRefreshToken(token!) as JwtPayload;
+    const newAccess = signAccessToken({ userId: decoded.userId });
 
     cookieStore.set('accessToken', newAccess, {
       httpOnly: true,

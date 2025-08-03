@@ -31,7 +31,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       isLoading: false,
       error: null,
@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
           } else {
             throw new Error('Invalid response from server');
           }
-        } catch (error: any) {
+        } catch (error) {
           let errorMessage = 'Login failed. Please try again.';
 
           if (axios.isAxiosError(error)) {
@@ -81,7 +81,7 @@ export const useAuthStore = create<AuthState>()(
           } else {
             throw new Error('Invalid response from server');
           }
-        } catch (error: any) {
+        } catch (error) {
           let errorMessage = 'Registration failed. Please try again.';
 
           if (axios.isAxiosError(error)) {
